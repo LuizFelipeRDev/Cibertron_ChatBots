@@ -2,7 +2,7 @@
   
 > Chat multi‑IA inspirado em Transformers (Optimus Prime / Megatron), com persistência no Supabase e deploy separado Frontend + Backend.
   
-[Cibertron Chat Bots](https://cibertron-chat-bots.vercel.app/)
+Teste Agora: [Cibertron Chat Bots](https://cibertron-chat-bots.vercel.app/)
   
 ---
   
