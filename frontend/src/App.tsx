@@ -28,11 +28,13 @@ import {
   HelpCircle,
   Clock
 } from "lucide-react";
+import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import KeyboardDoubleArrowRight from "@mui/icons-material/KeyboardDoubleArrowRight";
 import { Message, ChatSession, SystemMetrics } from "./types";
 import AudioWaveform from "./components/AudioWaveform";
 import { getLoadingMessages } from "./helper/loadingMessages";
 import { megatronPrompts, optimusPrimePrompts } from "./helper/quickPromts";
-import  Logo  from "./assets/logo.png";
+import Logo from "./assets/logo.png";
 
 // API base URL — configurado via .env ou painel da Vercel
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -115,7 +117,10 @@ export default function App() {
   const [activeSessionId, setActiveSessionId] = useState<string>("");
   const [inputMessage, setInputMessage] = useState<string>("");
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem("punkbot_sidebar_collapsed") === "true";
+  });
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   // Voice Recording state
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -217,6 +222,12 @@ export default function App() {
       setIsDarkMode(savedTheme === "dark");
     }
 
+    // Load sidebar collapsed state
+    const savedCollapsed = localStorage.getItem("punkbot_sidebar_collapsed");
+    if (savedCollapsed === "true") {
+      setIsSidebarCollapsed(true);
+    }
+
     // Check microphone permissions early
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(() => setHasMicrophonePermission(true))
@@ -266,6 +277,11 @@ export default function App() {
     setIsDarkMode(nextTheme);
     localStorage.setItem("punkbot_theme", nextTheme ? "dark" : "light");
   };
+
+  // Persist sidebar collapsed state
+  useEffect(() => {
+    localStorage.setItem("punkbot_sidebar_collapsed", String(isSidebarCollapsed));
+  }, [isSidebarCollapsed]);
 
   // Create a new session
   const createNewSession = () => {
@@ -651,24 +667,24 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
       {/* COLLAPSIBLE SIDEBAR: Chat History & Console */}
       <aside
         id="cyberpunk-sidebar"
-        className={`fixed md:relative z-40 top-0 bottom-0 left-0 w-80 shrink-0 border-r transition-all duration-300 ease-in-out
-  flex flex-col h-full overflow-hidden
+        className={`fixed md:relative z-40 top-0 bottom-0 left-0 ${isSidebarCollapsed ? 'w-16' : 'w-80'} shrink-0 border-r transition-all duration-300 ease-in-out
+  flex flex-col ${isSidebarCollapsed ? 'min-h-screen' : 'h-full'} overflow-hidden
   ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
   ${isDarkMode
-            ? "bg-[#07070d]/95 md:bg-[#07070d] border-[#ff00ff]/20"
-            : "bg-white/95 md:bg-white border-gray-200"
+            ? "bg-[#07070d] border-[#ff00ff]/20"
+            : "bg-white border-gray-200"
           }`}
       >
 
         {/* MAIN AREA (top + middle) */}
-        <div className="flex flex-col flex-1 min-h-0">
+        <div className={`flex flex-col flex-1 min-h-0 ${isSidebarCollapsed ? 'items-center' : ''}`}>
 
           {/* Sidebar Title Header */}
-          <div className={`p-5 flex items-center justify-between border-b
+          <div className={`${isSidebarCollapsed ? 'p-3 justify-center' : 'p-5 justify-between'} flex items-center border-b
       ${isDarkMode ? "border-[#ff00ff]/20 bg-[#0a0a14]/50" : "border-gray-100 bg-gray-50"}
     `}>
             <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0
           ${isDarkMode
                   ? "bg-[#ff00ff] text-black shadow-[0_0_12px_rgba(255,0,255,0.8)]"
                   : "bg-purple-600 text-white"
@@ -676,19 +692,47 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
                 <img src={Logo} alt="Logo" className="w-7 h-5" />
               </div>
 
-              <div className="flex flex-col">
-                <span className={`font-black text-lg tracking-wider
-            ${isDarkMode ? "text-[#ff00ff]" : "text-purple-700"}
-          `}>
-                  {botName} //
-                </span>
+              {!isSidebarCollapsed && (
+                <div className="flex flex-col">
+                  <span className={`font-black text-lg tracking-wider
+              ${isDarkMode ? "text-[#ff00ff]" : "text-purple-700"}
+            `}>
+                    {botName} //
+                  </span>
 
-                <span className="text-[9px] font-mono opacity-50 tracking-widest uppercase">
-                  {isDarkMode ? "Version Decepticon" : "Version Autobot"}
-                </span>
-              </div>
+                  <span className="text-[9px] font-mono opacity-50 tracking-widest uppercase">
+                    {isDarkMode ? "Version Decepticon" : "Version Autobot"}
+                  </span>
+                </div>
+              )}
             </div>
+
+            {/* Collapse / Expand button */}
+            {!isSidebarCollapsed ? (
+              <button
+                onClick={() => setIsSidebarCollapsed(true)}
+                className={`p-1.5 rounded-lg transition-colors
+                  ${isDarkMode ? "hover:bg-[#ff00ff]/10 text-gray-400 hover:text-[#ff00ff]" : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"}`}
+                title="Recolher sidebar"
+              >
+                <KeyboardDoubleArrowLeft fontSize="small" />
+              </button>
+            ) : null}
           </div>
+
+          {/* Expand button when collapsed */}
+          {isSidebarCollapsed && (
+            <div className="flex flex-col items-center gap-3 py-3">
+              <button
+                onClick={() => setIsSidebarCollapsed(false)}
+                className={`p-2 rounded-lg transition-colors
+                  ${isDarkMode ? "hover:bg-[#ff00ff]/10 text-gray-400 hover:text-[#ff00ff]" : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"}`}
+                title="Expandir sidebar"
+              >
+                <KeyboardDoubleArrowRight fontSize="small" />
+              </button>
+            </div>
+          )}
 
           {/* NEW CHAT */}
           <div className="p-4 shrink-0">
@@ -698,13 +742,15 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
         ${isDarkMode
                   ? "border-[#00ffff]/50 text-[#00ffff] bg-[#00ffff]/5"
                   : "border-purple-600 text-purple-700 bg-purple-50"
-                }`}
+                } ${isSidebarCollapsed ? 'w-10 h-10 p-0 mx-auto' : ''}`}
+              title="Nova sessão"
             >
-              + NOVO_UPLINK
+              {isSidebarCollapsed ? "+" : "+ NOVO_UPLINK"}
             </button>
           </div>
 
           {/*  SESSIONS  */}
+          {!isSidebarCollapsed && (
           <div className="h-[330px] overflow-y-auto px-4 pb-4 space-y-2.5 shrink-0">
 
             <div className="flex items-center justify-between px-1 mb-2">
@@ -725,10 +771,10 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
                   key={sess.id}
                   onClick={() => selectSession(sess.id)}
                   className={`p-3 rounded-lg cursor-pointer border flex flex-col gap-1 duration-200
-            ${isDarkMode ? 
-              "border-[#ff00ff]/20 bg-[#ff00ff]/3 hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/6" 
-              : 
-              "border-purple-200 bg-purple-50/20  hover:border-purple-500 hover:bg-purple-50/40"}
+            ${isDarkMode ?
+                      "border-[#ff00ff]/20 bg-[#ff00ff]/3 hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/6"
+                      :
+                      "border-purple-200 bg-purple-50/20  hover:border-purple-500 hover:bg-purple-50/40"}
           `}
                 >
                   <div className="flex items-start justify-between ">
@@ -755,10 +801,12 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
               ))
             )}
           </div>
+          )}
 
         </div>
 
-        {/* BOTTOM FIXO */}
+        {/* BOTTOM FIXO - expanded */}
+        {!isSidebarCollapsed && (
         <div className="shrink-0">
 
           {/* TERMINAL */}
@@ -806,11 +854,28 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
           </div>
 
         </div>
+        )}
+
+        {/* BOTTOM - collapsed (just theme toggle) */}
+        {isSidebarCollapsed && (
+        <div className="shrink-0 pb-4 flex justify-center">
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg border transition-all ${isDarkMode
+              ? "border-white/10 text-yellow-400 hover:bg-white/5"
+              : "border-gray-200 text-purple-600 hover:bg-gray-100 bg-white"
+              }`}
+            title="Mudar visual (Escuro/Claro)"
+          >
+            {isDarkMode ? <Sun size={14} /> : <Moon size={14} />}
+          </button>
+        </div>
+        )}
 
       </aside>
 
       {/* MAIN VIEW CONTENT AREA */}
-      <main className={`flex-1 flex flex-col h-screen overflow-hidden relative transition-all duration-200 ${isDarkMode
+      <main className={`flex-1 flex flex-col h-screen overflow-hidden relative transition-all duration-200 ${isSidebarCollapsed && isSidebarOpen ? 'ml-16 md:ml-0' : 'ml-0 md:ml-0'} ${isDarkMode
         ? "bg-[radial-gradient(circle_at_center,_rgba(12,12,24,1)_0%,_rgba(5,5,10,1)_100%)]"
         : "bg-gray-50 text-gray-900"
         }`}>
@@ -885,53 +950,58 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
                 Terminal <span className={isDarkMode ? "text-[#ff00ff]" : "text-purple-600"}>CiberTron</span>
               </h1>
               <p className="text-xs md:text-sm opacity-70 max-w-lg mb-8">
-                {!isDarkMode ?
-                  'Eu sou Optimus Prime, líder dos Autobots. Protejo a vida e a liberdade em todos os mundos, lutando contra a tirania sem jamais recuar.'
-                  :
-                  'Eu sou Megatron, líder dos Decepticons. Nasci para dominar e impor ordem pelo poder absoluto, esmagando qualquer um que desafie meu comando.'
-                }
+                {!isDarkMode ? (
+                  <>
+                    Eu sou <span className="text-purple-600 font-bold">Optimus Prime</span>, líder dos{" "}
+                    <span className="text-purple-600 font-bold">Autobots</span>. Protejo a vida e a liberdade em todos os mundos,
+                    lutando contra a tirania sem jamais recuar.
+                  </>
+                ) : (
+                  <>
+                    Eu sou <span className="text-purple-400 font-semibold">Megatron</span>, líder dos{" "}
+                    <span className="text-purple-400 font-semibold">Decepticons</span>. Nasci para dominar e impor ordem pelo poder
+                    absoluto, esmagando qualquer um que desafie meu comando.
+                  </>
+                )}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl text-left">
-                      {randomPrompts.map((item, index) => {
-        const Icon = item.icon;
+                {randomPrompts.map((item, index) => {
+                  const Icon = item.icon;
 
-        return (
-          <div
-            key={index}
-            onClick={() => handleSendMessage(item.prompt)}
-            className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] group ${
-              isDarkMode
-                ? "bg-[#090915] border-white/5 hover:border-[#ff00ff]/40 hover:bg-[#ff00ff]/5"
-                : "bg-white border-gray-200 hover:border-purple-400 hover:bg-purple-50/30"
-            }`}
-          >
-            <div className="flex items-center gap-2 mb-1">
-              {Icon && (
-  <Icon className={`text-lg transition-colors duration-200 ${
-    isDarkMode
-      ? "text-[#00ffff] group-hover:text-[#ff00ff]"
-      : "text-purple-700 group-hover:text-purple-500"
-  }`} />
-)}
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => handleSendMessage(item.prompt)}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99] group ${isDarkMode
+                          ? "bg-[#090915] border-white/5 hover:border-[#ff00ff]/40 hover:bg-[#ff00ff]/5"
+                          : "bg-white border-gray-200 hover:border-purple-400 hover:bg-purple-50/30"
+                        }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        {Icon && (
+                          <Icon className={`text-lg transition-colors duration-200 ${isDarkMode
+                              ? "text-[#00ffff] group-hover:text-[#ff00ff]"
+                              : "text-purple-700 group-hover:text-purple-500"
+                            }`} />
+                        )}
 
-              <span
-                className={`text-xs font-bold tracking-wide uppercase ${
-                  isDarkMode
-                    ? "text-[#00ffff] group-hover:text-[#ff00ff]"
-                    : "text-purple-800"
-                }`}
-              >
-                {item.title}
-              </span>
-            </div>
+                        <span
+                          className={`text-xs font-bold tracking-wide uppercase ${isDarkMode
+                              ? "text-[#00ffff] group-hover:text-[#ff00ff]"
+                              : "text-purple-800"
+                            }`}
+                        >
+                          {item.title}
+                        </span>
+                      </div>
 
-            <p className="text-[11px] opacity-60 line-clamp-2 leading-relaxed">
-              {item.prompt}
-            </p>
-          </div>
-        );
-      })}
+                      <p className="text-[11px] opacity-60 line-clamp-2 leading-relaxed">
+                        {item.prompt}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : (
