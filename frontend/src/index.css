@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-cyber-dark: #07070e;
+  --color-cyber-gray: #0f0f1c;
+  --color-cyber-light: #16162d;
+  --color-cyber-pink: #ff007f;
+  --color-cyber-cyan: #00f0ff;
+  --color-cyber-purple: #9d4edd;
+  --color-cyber-yellow: #ffd319;
+  --color-cyber-green: #39ff14;
+  
+  --shadow-neon-pink: 0 0 10px rgba(255, 0, 127, 0.6), 0 0 20px rgba(255, 0, 127, 0.3);
+  --shadow-neon-cyan: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.3);
+  --shadow-neon-purple: 0 0 10px rgba(157, 78, 221, 0.6), 0 0 20px rgba(157, 78, 221, 0.3);
+  --shadow-neon-green: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.3);
+}
+
+/* Custom Cyberpunk style animations and effects */
+@keyframes flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% {
+    opacity: 0.99;
+    filter: drop-shadow(0 0 2px rgba(0, 240, 255, 0.7));
+  }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    opacity: 0.5;
+    filter: none;
+  }
+}
+
+.animate-flicker {
+  animation: flicker 5s infinite alternate;
+}
+
+@keyframes pulse-neon {
+  0%, 100% {
+    opacity: 0.7;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.9);
+  }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s infinite ease-in-out;
+}
+
+@keyframes glitch {
+  0% {
+    text-shadow: 0.05em 0 0 rgba(255, 0, 127, 0.75), -0.05em -0.025em 0 rgba(0, 240, 255, 0.75),
+      -0.025em 0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+  14% {
+    text-shadow: 0.05em 0 0 rgba(255, 0, 127, 0.75), -0.05em -0.025em 0 rgba(0, 240, 255, 0.75),
+      -0.025em 0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+  15% {
+    text-shadow: -0.05em -0.025em 0 rgba(255, 0, 127, 0.75), 0.025em 0.025em 0 rgba(0, 240, 255, 0.75),
+      -0.05em -0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+  49% {
+    text-shadow: -0.05em -0.025em 0 rgba(255, 0, 127, 0.75), 0.025em 0.025em 0 rgba(0, 240, 255, 0.75),
+      -0.05em -0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+  50% {
+    text-shadow: 0.025em 0.05em 0 rgba(255, 0, 127, 0.75), 0.05em 0 0 rgba(0, 240, 255, 0.75),
+      0 -0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+  99% {
+    text-shadow: 0.025em 0.05em 0 rgba(255, 0, 127, 0.75), 0.05em 0 0 rgba(0, 240, 255, 0.75),
+      0 -0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+  100% {
+    text-shadow: -0.025em 0 0 rgba(255, 0, 127, 0.75), -0.025em -0.025em 0 rgba(0, 240, 255, 0.75),
+      -0.025em -0.05em 0 rgba(157, 78, 221, 0.75);
+  }
+}
+
+.glitch-text:hover {
+  animation: glitch 500ms infinite;
+}
+
+/* scanline screen overlay */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.15) 50%
+  ), linear-gradient(
+    90deg, 
+    rgba(255, 0, 0, 0.03), 
+    rgba(0, 255, 0, 0.01), 
+    rgba(0, 0, 255, 0.03)
+  );
+  z-index: 50;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #07070e;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff007f;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
+
+/* Custom soundwave animations */
+@keyframes voice-wave-1 {
+  0%, 100% { height: 10%; }
+  50% { height: 80%; }
+}
+@keyframes voice-wave-2 {
+  0%, 100% { height: 20%; }
+  50% { height: 100%; }
+}
+@keyframes voice-wave-3 {
+  0%, 100% { height: 15%; }
+  50% { height: 60%; }
+}
+
+.wave-bar-1 { animation: voice-wave-1 0.6s ease-in-out infinite; }
+.wave-bar-2 { animation: voice-wave-2 0.8s ease-in-out infinite; }
+.wave-bar-3 { animation: voice-wave-3 0.5s ease-in-out infinite; }
+
+/* Glowing neon classes helper for direct styling */
+.neon-border-pink {
+  border: 1px solid #ff007f;
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+}
+.neon-border-cyan {
+  border: 1px solid #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+.neon-border-green {
+  border: 1px solid #39ff14;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}
+.neon-border-purple {
+  border: 1px solid #9d4edd;
+  box-shadow: 0 0 8px rgba(157, 78, 221, 0.4);
+}

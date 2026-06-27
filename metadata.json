@@ -1,0 +1,6 @@
+{
+  "name": "punkbot",
+  "description": "Chatbot cyberpunk com suporte a mensagens de voz e estilo neon futurista.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
