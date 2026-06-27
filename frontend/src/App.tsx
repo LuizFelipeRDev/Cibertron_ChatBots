@@ -668,7 +668,7 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
       <aside
         id="cyberpunk-sidebar"
         className={`fixed md:relative z-40 top-0 bottom-0 left-0 ${isSidebarCollapsed ? 'w-16' : 'w-80'} shrink-0 border-r transition-all duration-300 ease-in-out
-  flex flex-col ${isSidebarCollapsed ? 'min-h-screen' : 'h-full'} overflow-hidden
+  flex flex-col h-dvh overflow-hidden
   ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
   ${isDarkMode
             ? "bg-[#07070d] border-[#ff00ff]/20"
@@ -807,7 +807,7 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
 
         {/* BOTTOM FIXO - expanded */}
         {!isSidebarCollapsed && (
-        <div className="shrink-0">
+        <div className="mt-auto shrink-0">
 
           {/* TERMINAL */}
           <div className={`px-4 py-3 border-t font-mono
@@ -858,7 +858,7 @@ As transmissões entre as unidades de IA podem estar oscilando ou parcialmente i
 
         {/* BOTTOM - collapsed (just theme toggle) */}
         {isSidebarCollapsed && (
-        <div className="shrink-0 pb-4 flex justify-center">
+        <div className="mt-auto shrink-0 pb-4 flex justify-center">
           <button
             onClick={toggleTheme}
             className={`p-2 rounded-lg border transition-all ${isDarkMode
